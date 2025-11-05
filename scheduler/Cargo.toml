@@ -1,0 +1,21 @@
+[package]
+name = "scheduler"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+dioxus = {version = "0.7.0-rc.2", optional = true}
+channel = {workspace = true}
+timer = {workspace = true}
+futures = {workspace = true}
+tracing = {workspace = true}
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+tokio = {workspace = true}
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+
+[features]
+dioxus = ["dep:dioxus"]
+#native = ["dep:tokio"]
+#web = ["dep:async-channel"]

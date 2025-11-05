@@ -1,0 +1,22 @@
+[workspace]
+name = "rust_tools"
+edition = "2024"
+version = "0.0.1"
+resolver = "3"
+
+members = ["async_runtime", "channel", "scheduler"
+
+    , "timer"]
+
+[workspace.dependencies]
+tracing = "0.1.41"
+channel = { path = "channel" }
+async_runtime = { path = "async_runtime" }
+timer = {path = "timer"}
+futures = "0.3.31"
+
+thiserror = { version = "2.0" }
+tokio = { version = "1.48", features = ["full"] }
+async-channel = { version = "2.5" }
+gloo = {version = "0.11.0"}
+pin-project = {version = "1.1"}

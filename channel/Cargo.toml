@@ -1,0 +1,11 @@
+[package]
+name = "channel"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+tokio = {workspace = true}
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+async-channel = {workspace = true}
