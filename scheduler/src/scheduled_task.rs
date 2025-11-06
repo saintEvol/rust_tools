@@ -1,15 +1,15 @@
-use crate::command::{ScheduleSpec, TaskId};
+use crate::command::{ScheduleSpec, ScheduleId};
 use std::cmp::Ordering;
 use std::time::Instant;
 
 pub(super) struct ScheduledTask {
-    task_id: TaskId,
+    task_id: ScheduleId,
     when: Instant,
     spec: ScheduleSpec,
 }
 
 impl ScheduledTask {
-    pub fn new(task_id: TaskId, spec: ScheduleSpec) -> Self {
+    pub fn new(task_id: ScheduleId, spec: ScheduleSpec) -> Self {
         let when = spec.when();
         ScheduledTask {
             task_id,
@@ -18,7 +18,7 @@ impl ScheduledTask {
         }
     }
 
-    pub fn task_id(&self) -> &TaskId {
+    pub fn task_id(&self) -> &ScheduleId {
         &self.task_id
     }
 

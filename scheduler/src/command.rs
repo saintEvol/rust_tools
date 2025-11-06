@@ -1,9 +1,9 @@
 use std::time::{Duration, Instant};
 
-pub type TaskId = u64;
+pub type ScheduleId = u64;
 
-pub type RepeatCallback = Box<dyn FnMut(TaskId) + Send + 'static>;
-pub type OnceCallback = Box<dyn FnOnce(TaskId) + Send + 'static>;
+pub type RepeatCallback = Box<dyn FnMut(ScheduleId) + Send + 'static>;
+pub type OnceCallback = Box<dyn FnOnce(ScheduleId) + Send + 'static>;
 
 pub enum ScheduleSpec {
     // OnceAfter(Duration, OnceCallback),
@@ -43,5 +43,5 @@ impl ScheduleSpec {
 
 pub enum Command {
     Add(ScheduleSpec),
-    Remove(TaskId),
+    Remove(ScheduleId),
 }

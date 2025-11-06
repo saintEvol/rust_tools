@@ -1,4 +1,4 @@
-use crate::command::{Command, OnceCallback, RepeatCallback, ScheduleSpec, TaskId};
+use crate::command::{Command, OnceCallback, RepeatCallback, ScheduleSpec, ScheduleId};
 use crate::scheduled_task::ScheduledTask;
 use channel::async_channel::{SendError, UnboundedReceiver, UnboundedSender, unbounded};
 #[cfg(feature = "dioxus")]
@@ -24,7 +24,7 @@ impl Scheduler {
     pub fn once_after(
         &mut self,
         duration: Duration,
-        handle: impl FnOnce(TaskId) + Send + 'static,
+        handle: impl FnOnce(ScheduleId) + Send + 'static,
     ) -> Result<(), SendError> {
         let handle = Box::new(handle) as OnceCallback;
         let spec = ScheduleSpec::once_after(duration, handle);
@@ -35,7 +35,7 @@ impl Scheduler {
     pub fn once_at(
         &mut self,
         instant: Instant,
-        handle: impl FnOnce(TaskId) + Send + 'static,
+        handle: impl FnOnce(ScheduleId) + Send + 'static,
     ) -> Result<(), SendError> {
         let handle = Box::new(handle) as OnceCallback;
         let spec = ScheduleSpec::once_at(instant, handle);
@@ -46,7 +46,7 @@ impl Scheduler {
     pub fn repeat(
         &mut self,
         interval: Duration,
-        handle: impl FnMut(TaskId) + Send + 'static,
+        handle: impl FnMut(ScheduleId) + Send + 'static,
     ) -> Result<(), SendError> {
         let handle = Box::new(handle) as RepeatCallback;
         let spec = ScheduleSpec::repeat(interval, handle);
@@ -54,15 +54,15 @@ impl Scheduler {
         self.tx.send(cmd)
     }
 
-    pub fn remove(&mut self, id: TaskId) -> Result<(), SendError> {
+    pub fn remove(&mut self, id: ScheduleId) -> Result<(), SendError> {
         let cmd = Command::Remove(id);
         self.tx.send(cmd)
     }
 
     fn run(mut rx: UnboundedReceiver<Command>) {
         let f = async move {
-            let mut next_id: TaskId = 1;
-            let mut deleting = HashSet::<TaskId>::new();
+            let mut next_id: ScheduleId = 1;
+            let mut deleting = HashSet::<ScheduleId>::new();
             let mut tasks = BinaryHeap::<ScheduledTask>::new();
             loop {
                 let now = Instant::now();
@@ -122,7 +122,7 @@ impl Scheduler {
         };
 
         fn peek_valid_task_deadline(
-            deleting: &mut HashSet<TaskId>,
+            deleting: &mut HashSet<ScheduleId>,
             tasks: &mut BinaryHeap<ScheduledTask>,
         ) -> Option<Instant> {
             while let Some((task_id, when)) = tasks.peek().map(|t| (*t.task_id(), t.when())) {
