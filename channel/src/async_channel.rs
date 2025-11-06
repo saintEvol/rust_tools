@@ -47,6 +47,7 @@ impl<T> From<async_channel::SendError<T>> for SendError {
     }
 }
 
+#[derive(Clone)]
 pub struct UnboundedSender<T> {
     #[cfg(not(target_arch = "wasm32"))]
     inner: TokioUnboundedSender<T>,
