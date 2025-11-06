@@ -57,14 +57,14 @@ pub struct UnboundedSender<T> {
 impl<T> UnboundedSender<T> {
     #[cfg(not(target_arch = "wasm32"))]
     #[inline]
-    pub fn send(&mut self, data: T) -> Result<(), SendError> {
+    pub fn send(&self, data: T) -> Result<(), SendError> {
         self.inner.send(data)?;
         Ok(())
     }
 
     #[cfg(target_arch = "wasm32")]
     #[inline]
-    pub fn send(&mut self, data: T) -> Result<(), SendError> {
+    pub fn send(&self, data: T) -> Result<(), SendError> {
         self.inner.force_send(data)?;
         Ok(())
     }
