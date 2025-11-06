@@ -1,7 +1,7 @@
 use crate::command::{Command, OnceCallback, RepeatCallback, ScheduleId, ScheduleSpec};
 use crate::error::ScheduleError;
 use crate::scheduled_task::ScheduledTask;
-use channel::async_channel::{SendError, UnboundedReceiver, UnboundedSender, one_shot, unbounded};
+use channel::async_channel::{SendError, UnboundedReceiver, UnboundedSender, oneshot, unbounded};
 #[cfg(feature = "dioxus")]
 use dioxus::prelude::spawn;
 use futures::FutureExt;
@@ -58,7 +58,7 @@ impl Scheduler {
     }
 
     async fn add_schedule_spec(&mut self, spec: ScheduleSpec) -> Result<ScheduleId, ScheduleError> {
-        let (tx, rx) = one_shot();
+        let (tx, rx) = oneshot();
         let cmd = Command::Add(spec, tx);
         self.tx
             .send(cmd)

@@ -150,7 +150,7 @@ impl<T> OneShotSender<T> {
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-pub fn one_shot<T>() -> (OneShotSender<T>, OneShotReceiver<T>) {
+pub fn oneshot<T>() -> (OneShotSender<T>, OneShotReceiver<T>) {
     let (tokio_sender, tokio_receiver) = tokio::sync::oneshot::channel();
     (
         OneShotSender { tokio_sender },
@@ -159,7 +159,7 @@ pub fn one_shot<T>() -> (OneShotSender<T>, OneShotReceiver<T>) {
 }
 
 #[cfg(target_arch = "wasm32")]
-pub fn one_shot<T>() -> (OneShotSender<T>, OneShotReceiver<T>) {
+pub fn oneshot<T>() -> (OneShotSender<T>, OneShotReceiver<T>) {
     let (web_sender, web_receiver) = async_channel::unbounded();
     (
         OneShotSender { web_sender },
