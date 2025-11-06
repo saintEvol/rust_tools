@@ -1,6 +1,7 @@
-use crate::command::{Command, OnceCallback, RepeatCallback, ScheduleSpec, ScheduleId};
+use crate::command::{Command, OnceCallback, RepeatCallback, ScheduleId, ScheduleSpec};
+use crate::error::ScheduleError;
 use crate::scheduled_task::ScheduledTask;
-use channel::async_channel::{SendError, UnboundedReceiver, UnboundedSender, unbounded};
+use channel::async_channel::{SendError, UnboundedReceiver, UnboundedSender, one_shot, unbounded};
 #[cfg(feature = "dioxus")]
 use dioxus::prelude::spawn;
 use futures::FutureExt;
@@ -8,7 +9,7 @@ use std::collections::{BinaryHeap, HashSet};
 use std::time::{Duration, Instant};
 #[cfg(all(not(target_arch = "wasm32"), not(feature = "dioxus")))]
 use tokio::spawn;
-use tracing::warn;
+use tracing::{error, warn};
 
 pub struct Scheduler {
     tx: UnboundedSender<Command>,
@@ -21,42 +22,52 @@ impl Scheduler {
         Scheduler { tx }
     }
 
-    pub fn once_after(
+    pub async fn once_after(
         &mut self,
         duration: Duration,
         handle: impl FnOnce(ScheduleId) + Send + 'static,
-    ) -> Result<(), SendError> {
+    ) -> Result<ScheduleId, ScheduleError> {
         let handle = Box::new(handle) as OnceCallback;
         let spec = ScheduleSpec::once_after(duration, handle);
-        let cmd = Command::Add(spec);
-        self.tx.send(cmd)
+        self.add_schedule_spec(spec).await
     }
 
-    pub fn once_at(
+    pub async fn once_at(
         &mut self,
         instant: Instant,
         handle: impl FnOnce(ScheduleId) + Send + 'static,
-    ) -> Result<(), SendError> {
+    ) -> Result<ScheduleId, ScheduleError> {
         let handle = Box::new(handle) as OnceCallback;
         let spec = ScheduleSpec::once_at(instant, handle);
-        let cmd = Command::Add(spec);
-        self.tx.send(cmd)
+        self.add_schedule_spec(spec).await
     }
 
-    pub fn repeat(
+    pub async fn repeat(
         &mut self,
         interval: Duration,
         handle: impl FnMut(ScheduleId) + Send + 'static,
-    ) -> Result<(), SendError> {
+    ) -> Result<ScheduleId, ScheduleError> {
         let handle = Box::new(handle) as RepeatCallback;
         let spec = ScheduleSpec::repeat(interval, handle);
-        let cmd = Command::Add(spec);
-        self.tx.send(cmd)
+        self.add_schedule_spec(spec).await
     }
 
     pub fn remove(&mut self, id: ScheduleId) -> Result<(), SendError> {
         let cmd = Command::Remove(id);
         self.tx.send(cmd)
+    }
+
+    async fn add_schedule_spec(&mut self, spec: ScheduleSpec) -> Result<ScheduleId, ScheduleError> {
+        let (tx, rx) = one_shot();
+        let cmd = Command::Add(spec, tx);
+        self.tx
+            .send(cmd)
+            .map_err(|e| ScheduleError::Channel(e.to_string()))?;
+        let ret = rx
+            .recv()
+            .await
+            .map_err(|e| ScheduleError::Channel(e.to_string()))?;
+        Ok(ret)
     }
 
     fn run(mut rx: UnboundedReceiver<Command>) {
@@ -89,11 +100,14 @@ impl Scheduler {
                             }
                             Some(cmd) => {
                                 match cmd {
-                                    Command::Add(spec) => {
+                                    Command::Add(spec, notifier) => {
                                         let id = next_id;
                                         let task = ScheduledTask::new(id, spec);
                                         tasks.push(task);
                                         next_id += 1;
+                                        if let Err(_) = notifier.send(id) {
+                                            error!("发送[ScheduleId]失败: 接收方提前关闭");
+                                        }
                                     }
                                     Command::Remove(id) => {
                                         deleting.insert(id);

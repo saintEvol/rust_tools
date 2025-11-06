@@ -1553,6 +1553,7 @@ dependencies = [
  "channel",
  "dioxus",
  "futures",
+ "thiserror 2.0.17",
  "timer",
  "tokio",
  "tracing",

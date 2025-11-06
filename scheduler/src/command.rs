@@ -1,4 +1,5 @@
 use std::time::{Duration, Instant};
+use channel::async_channel::OneShotSender;
 
 pub type ScheduleId = u64;
 
@@ -42,6 +43,6 @@ impl ScheduleSpec {
 }
 
 pub enum Command {
-    Add(ScheduleSpec),
+    Add(ScheduleSpec, OneShotSender<ScheduleId>),
     Remove(ScheduleId),
 }

@@ -1,3 +1,4 @@
+use std::fmt::{Display, Formatter};
 #[cfg(not(target_arch = "wasm32"))]
 use tokio::sync::mpsc::UnboundedReceiver as TokioUnboundedReceiver;
 #[cfg(not(target_arch = "wasm32"))]
@@ -12,9 +13,21 @@ use tokio::sync::oneshot::{Receiver, Sender};
 #[derive(Debug)]
 pub struct SendError(pub String);
 
+impl Display for SendError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+
 /// 收取消息错误，原因只有一个：发送端提交关闭（且收取端为空)
 #[derive(Debug)]
 pub struct RecvError;
+
+impl Display for RecvError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "send half canceled")
+    }
+}
 
 // #[cfg(target_arch = "wasm32")]
 // #[derive(Debug)]
