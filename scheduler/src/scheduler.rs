@@ -52,7 +52,7 @@ impl Scheduler {
         self.add_schedule_spec(spec).await
     }
 
-    pub fn remove(&mut self, id: ScheduleId) -> Result<(), SendError> {
+    pub fn cancel(&mut self, id: ScheduleId) -> Result<(), SendError> {
         let cmd = Command::Remove(id);
         self.tx.send(cmd)
     }
