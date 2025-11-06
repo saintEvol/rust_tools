@@ -114,14 +114,14 @@ pub fn unbounded<T>() -> (UnboundedSender<T>, UnboundedReceiver<T>) {
     )
 }
 
-pub struct OneShotSender<T> {
+pub struct OneshotSender<T> {
     #[cfg(not(target_arch = "wasm32"))]
     tokio_sender: Sender<T>,
     #[cfg(target_arch = "wasm32")]
     web_sender: async_channel::Sender<T>,
 }
 
-impl<T> OneShotSender<T> {
+impl<T> OneshotSender<T> {
     #[cfg(not(target_arch = "wasm32"))]
     #[inline]
     pub fn send(self, data: T) -> Result<(), T> {
@@ -150,31 +150,31 @@ impl<T> OneShotSender<T> {
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-pub fn oneshot<T>() -> (OneShotSender<T>, OneShotReceiver<T>) {
+pub fn oneshot<T>() -> (OneshotSender<T>, OneshotReceiver<T>) {
     let (tokio_sender, tokio_receiver) = tokio::sync::oneshot::channel();
     (
-        OneShotSender { tokio_sender },
-        OneShotReceiver { tokio_receiver },
+        OneshotSender { tokio_sender },
+        OneshotReceiver { tokio_receiver },
     )
 }
 
 #[cfg(target_arch = "wasm32")]
-pub fn oneshot<T>() -> (OneShotSender<T>, OneShotReceiver<T>) {
+pub fn oneshot<T>() -> (OneshotSender<T>, OneshotReceiver<T>) {
     let (web_sender, web_receiver) = async_channel::unbounded();
     (
-        OneShotSender { web_sender },
-        OneShotReceiver { web_receiver },
+        OneshotSender { web_sender },
+        OneshotReceiver { web_receiver },
     )
 }
 
-pub struct OneShotReceiver<T> {
+pub struct OneshotReceiver<T> {
     #[cfg(not(target_arch = "wasm32"))]
     tokio_receiver: Receiver<T>,
     #[cfg(target_arch = "wasm32")]
     web_receiver: async_channel::Receiver<T>,
 }
 
-impl<T> OneShotReceiver<T> {
+impl<T> OneshotReceiver<T> {
     #[cfg(not(target_arch = "wasm32"))]
     pub async fn recv(self) -> Result<T, RecvError> {
         match self.tokio_receiver.await {
