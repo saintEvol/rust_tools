@@ -6,7 +6,7 @@ use channel::async_channel::{SendError, UnboundedReceiver, UnboundedSender, ones
 use dioxus::prelude::spawn;
 use futures::FutureExt;
 use std::collections::{BinaryHeap, HashSet};
-use std::time::{Duration, Instant};
+use types::{Duration, Instant};
 #[cfg(all(not(target_arch = "wasm32"), not(feature = "dioxus")))]
 use tokio::spawn;
 use tracing::{error, warn};

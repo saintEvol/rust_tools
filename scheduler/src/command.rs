@@ -1,4 +1,4 @@
-use std::time::{Duration, Instant};
+use types::{Duration, Instant};
 use channel::async_channel::OneshotSender;
 
 pub type ScheduleId = u64;

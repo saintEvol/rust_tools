@@ -1,6 +1,6 @@
 use crate::command::{ScheduleSpec, ScheduleId};
 use std::cmp::Ordering;
-use std::time::Instant;
+use types::Instant;
 
 pub(super) struct ScheduledTask {
     task_id: ScheduleId,

@@ -6,15 +6,15 @@ resolver = "3"
 
 members = ["async_runtime", "channel", "scheduler"
 
-    , "timer"]
+    , "timer", "types"]
 
 [workspace.dependencies]
-tracing = "0.1.41"
+types = {path = "types"}
 channel = { path = "channel" }
-async_runtime = { path = "async_runtime" }
 timer = {path = "timer"}
-futures = "0.3.31"
 
+futures = "0.3.31"
+tracing = "0.1.41"
 thiserror = { version = "2.0" }
 tokio = { version = "1.48", features = ["full"] }
 async-channel = { version = "2.5" }

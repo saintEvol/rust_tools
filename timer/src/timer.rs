@@ -1,6 +1,6 @@
 use std::pin::Pin;
 use std::task::{Context, Poll};
-use std::time::Instant;
+use types::Instant;
 
 #[pin_project::pin_project]
 pub struct Sleep {
