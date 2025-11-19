@@ -4,19 +4,33 @@ edition = "2024"
 version = "0.0.1"
 resolver = "3"
 
-members = ["async_runtime", "channel", "scheduler"
+members = ["async_runtime", "channel", "http_utils", "jwt", "scheduler"
 
-    , "timer", "types"]
+    , "time", "timer", "types"]
 
 [workspace.dependencies]
-types = {path = "types"}
+types = { path = "types" }
 channel = { path = "channel" }
-timer = {path = "timer"}
+timer = { path = "timer" }
+time = {path = "time"}
+http_utils = { path = "http_utils" }
+axum = { version = "0.8", features = ["default"] }
+scru128 = {version = "3.2"}
 
-futures = "0.3.31"
-tracing = "0.1.41"
+
+chrono = { version = "0.4", features = ["default"] }
+jsonwebtoken = { version = "10.2", features = ["rust_crypto"] }
+http = { version = "1.3" }
+axum-core = { version = "0.5" }
+axum-extra = { version = "0.12" }
+
+serde = { version = "1.0", features = ["derive"] }
+serde_json = { version = "1.0" }
+
+futures = "0.3"
+tracing = "0.1"
 thiserror = { version = "2.0" }
 tokio = { version = "1.48", features = ["full"] }
 async-channel = { version = "2.5" }
-gloo = {version = "0.11.0"}
-pin-project = {version = "1.1"}
+gloo = { version = "0.11" }
+pin-project = { version = "1.1" }

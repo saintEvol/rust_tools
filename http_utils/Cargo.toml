@@ -1,0 +1,15 @@
+[package]
+name = "http_utils"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+http = {workspace = true}
+axum-core = {workspace = true}
+axum-extra = {workspace = true, features = ["typed-header"]}
+serde = {workspace = true, optional = true}
+
+[features]
+http_types = ["dep:serde"]
+http_serde_camel_case = []
+full = ["http_types", "http_serde_camel_case"]
